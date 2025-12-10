@@ -68,7 +68,6 @@ The application determines if a sequence is a valid protein candidate based on 4
 ## 👤 Author
 
 **Majid Hadji**
--   Course: CS 115, Summer 2025
 -   Project: DNA Sequence Analyzer
 
 ## 📄 License
