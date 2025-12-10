@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.DS_Store
+*.log
+venv
+__pycache__
+Dockerfile
+.dockerignore
+.gitignore
+README.md
