@@ -1,0 +1,21 @@
+steps:
+  # Build the Backend container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/dna-backend', './backend']
+  
+  # Build the Frontend container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/dna-frontend', './frontend']
+
+  # Push the Backend container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/dna-backend']
+
+  # Push the Frontend container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/dna-frontend']
+
+# Use specific logging option to avoid needing a user-owned logs bucket
+# when using a custom service account.
+options:
+  logging: CLOUD_LOGGING_ONLY
