@@ -290,7 +290,7 @@ export default function Home() {
         <div className="mt-4 flex justify-center gap-6">
           <button onClick={() => setShowAbout(true)} className="hover:text-blue-600 transition-colors">About</button>
           <a href="#" className="hover:text-blue-600 transition-colors">Contact</a>
-          <a href="#" className="hover:text-blue-600 transition-colors">GitHub</a>
+          <a href="https://github.com/MajidHadji66/DNA" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">GitHub</a>
         </div>
       </footer>
     </main>
