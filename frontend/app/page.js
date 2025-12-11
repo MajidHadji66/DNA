@@ -286,7 +286,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="mt-20 border-t border-gray-200 pt-8 text-center text-gray-500 text-sm pb-8">
         <p>&copy; 2025 Majid Hadji. All rights reserved.</p>
-        <p className="mt-2">DNA Sequence Analyzer Project</p>
+        <p className="mt-2">DNA Sequence Analyzer Project for educational purposes</p>
         <div className="mt-4 flex justify-center gap-6">
           <button onClick={() => setShowAbout(true)} className="hover:text-blue-600 transition-colors">About</button>
           <a href="#" className="hover:text-blue-600 transition-colors">Contact</a>
