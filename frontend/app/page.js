@@ -9,6 +9,17 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
 export default function Home() {
   const [file, setFile] = useState(null);
@@ -145,9 +156,8 @@ export default function Home() {
             <div className='space-y-6'>
               {/* Status Card */}
               <div
-                className={`p-6 rounded-xl shadow-md text-white flex items-center justify-between ${
-                  result.is_protein ? "bg-green-600" : "bg-red-500"
-                }`}
+                className={`p-6 rounded-xl shadow-md text-white flex items-center justify-between ${result.is_protein ? "bg-green-600" : "bg-red-500"
+                  }`}
               >
                 <div>
                   <h2 className='text-2xl font-bold'>
@@ -186,21 +196,47 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Nucleotide Counts */}
               <div className='bg-white p-6 rounded-xl shadow-md'>
                 <h3 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-                  <Activity size={20} /> Nucleotide Composition
+                  <Activity size={20} /> Nucleotide Mass Distribution (%)
                 </h3>
-                <div className='grid grid-cols-4 gap-2 text-center'>
+                <div className='h-64 w-full'>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={[
+                        { name: 'A', value: result.mass_percentages[0], color: '#ef4444' },
+                        { name: 'C', value: result.mass_percentages[1], color: '#f59e0b' },
+                        { name: 'T', value: result.mass_percentages[2], color: '#3b82f6' },
+                        { name: 'G', value: result.mass_percentages[3], color: '#22c55e' },
+                      ]}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="value" name="Mass %">
+                        {
+                          [
+                            { name: 'A', color: '#ef4444' }, // Red
+                            { name: 'C', color: '#f59e0b' }, // Yellow
+                            { name: 'T', color: '#3b82f6' }, // Blue
+                            { name: 'G', color: '#22c55e' }, // Green
+                          ].map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))
+                        }
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                {/* Raw Counts Footer */}
+                <div className='grid grid-cols-4 gap-2 text-center mt-4 pt-4 border-t border-gray-100'>
                   {["A", "C", "T", "G"].map((nuc, idx) => (
-                    <div key={nuc} className='p-3 bg-gray-50 rounded-lg'>
-                      <div className='text-xl font-bold text-blue-900'>
-                        {nuc}
-                      </div>
-                      <div className='text-gray-600'>{result.counts[idx]}</div>
-                      <div className='text-xs text-gray-400 mt-1'>
-                        {result.mass_percentages[idx]}% mass
-                      </div>
+                    <div key={nuc}>
+                      <div className='text-xs font-bold text-gray-400'>{nuc} Count</div>
+                      <div className='text-gray-600 font-mono'>{result.counts[idx]}</div>
                     </div>
                   ))}
                 </div>
