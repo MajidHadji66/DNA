@@ -64,24 +64,28 @@ export default function Home() {
 
       {/* About Modal */}
       {showAbout && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full relative">
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white rounded-xl shadow-2xl p-8 max-w-md w-full relative'>
             <button
               onClick={() => setShowAbout(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              className='absolute top-4 right-4 text-gray-400 hover:text-gray-600'
             >
               <XCircle size={24} />
             </button>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">About This Project</h2>
-            <div className="space-y-4 text-gray-600">
+            <h2 className='text-2xl font-bold text-gray-800 mb-4'>
+              About This Project
+            </h2>
+            <div className='space-y-4 text-gray-600'>
               <p>
                 <strong>Author:</strong> Majid Hadji
               </p>
               <p>
-                <strong>Purpose:</strong> This application was built to analyze DNA sequences and determine their potential to encode proteins based on specific biological criteria.
+                <strong>Purpose:</strong> This application was built to analyze
+                DNA sequences and determine their potential to encode proteins
+                based on specific biological criteria.
               </p>
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-sm">Version 1.0.0</p>
+              <div className='pt-4 border-t border-gray-100'>
+                <p className='text-sm'>Version 1.0.0</p>
               </div>
             </div>
           </div>
@@ -141,8 +145,9 @@ export default function Home() {
             <div className='space-y-6'>
               {/* Status Card */}
               <div
-                className={`p-6 rounded-xl shadow-md text-white flex items-center justify-between ${result.is_protein ? "bg-green-600" : "bg-red-500"
-                  }`}
+                className={`p-6 rounded-xl shadow-md text-white flex items-center justify-between ${
+                  result.is_protein ? "bg-green-600" : "bg-red-500"
+                }`}
               >
                 <div>
                   <h2 className='text-2xl font-bold'>
@@ -226,71 +231,131 @@ export default function Home() {
       </div>
 
       {/* Education Section */}
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-
+      <div className='mt-12 grid grid-cols-1 md:grid-cols-2 gap-8'>
         {/* How It Works */}
-        <div className="bg-white p-8 rounded-xl shadow-md border-t-4 border-blue-500">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Activity className="text-blue-500" /> How it Works
+        <div className='bg-white p-8 rounded-xl shadow-md border-t-4 border-blue-500'>
+          <h2 className='text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2'>
+            <Activity className='text-blue-500' /> How it Works
           </h2>
-          <p className="text-gray-600 mb-4">
-            Our algorithm analyzes the DNA sequence to determine if it encodes a valid protein based on specific structural and chemical criteria.
+          <p className='text-gray-600 mb-4'>
+            Our algorithm analyzes the DNA sequence to determine if it encodes a
+            valid protein based on specific structural and chemical criteria.
           </p>
-          <ul className="space-y-3">
-            <li className="flex items-start gap-3">
-              <span className="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-sm mt-0.5">1</span>
-              <span className="text-gray-700"><strong>Start Codon:</strong> Must begin with the sequence <code className="bg-gray-100 px-1 rounded">ATG</code>.</span>
+          <ul className='space-y-3'>
+            <li className='flex items-start gap-3'>
+              <span className='bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-sm mt-0.5'>
+                1
+              </span>
+              <span className='text-gray-700'>
+                <strong>Start Codon:</strong> Must begin with the sequence{" "}
+                <code className='bg-gray-100 px-1 rounded'>ATG</code>.
+              </span>
             </li>
-            <li className="flex items-start gap-3">
-              <span className="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-sm mt-0.5">2</span>
-              <span className="text-gray-700"><strong>Stop Codon:</strong> Must end with one of the valid stop codons: <code className="bg-gray-100 px-1 rounded">TAA</code>, <code className="bg-gray-100 px-1 rounded">TAG</code>, or <code className="bg-gray-100 px-1 rounded">TGA</code>.</span>
+            <li className='flex items-start gap-3'>
+              <span className='bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-sm mt-0.5'>
+                2
+              </span>
+              <span className='text-gray-700'>
+                <strong>Stop Codon:</strong> Must end with one of the valid stop
+                codons: <code className='bg-gray-100 px-1 rounded'>TAA</code>,{" "}
+                <code className='bg-gray-100 px-1 rounded'>TAG</code>, or{" "}
+                <code className='bg-gray-100 px-1 rounded'>TGA</code>.
+              </span>
             </li>
-            <li className="flex items-start gap-3">
-              <span className="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-sm mt-0.5">3</span>
-              <span className="text-gray-700"><strong>Sequence Length:</strong> Must contain at least <strong>5 codons</strong> (including start and stop).</span>
+            <li className='flex items-start gap-3'>
+              <span className='bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-sm mt-0.5'>
+                3
+              </span>
+              <span className='text-gray-700'>
+                <strong>Sequence Length:</strong> Must contain at least{" "}
+                <strong>5 codons</strong> (including start and stop).
+              </span>
             </li>
-            <li className="flex items-start gap-3">
-              <span className="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-sm mt-0.5">4</span>
-              <span className="text-gray-700"><strong>Mass Percentage:</strong> Cytosine (C) and Guanine (G) must account for at least <strong>30%</strong> of the total mass.</span>
+            <li className='flex items-start gap-3'>
+              <span className='bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-sm mt-0.5'>
+                4
+              </span>
+              <span className='text-gray-700'>
+                <strong>Mass Percentage:</strong> Cytosine (C) and Guanine (G)
+                must account for at least <strong>30%</strong> of the total
+                mass.
+              </span>
             </li>
           </ul>
         </div>
 
         {/* Glossary */}
-        <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <FileText className="text-slate-500" /> Glossary
+        <div className='bg-slate-50 p-8 rounded-xl border border-slate-200'>
+          <h2 className='text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2'>
+            <FileText className='text-slate-500' /> Glossary
           </h2>
-          <div className="space-y-5">
+          <div className='space-y-5'>
             <div>
-              <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1">Codon</h3>
-              <p className="text-gray-600 text-sm">A sequence of 3 nucleotides that corresponds to a specific amino acid or stop signal during protein synthesis.</p>
+              <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
+                Codon
+              </h3>
+              <p className='text-gray-600 text-sm'>
+                A sequence of 3 nucleotides that corresponds to a specific amino
+                acid or stop signal during protein synthesis.
+              </p>
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1">Nucleotide</h3>
-              <p className="text-gray-600 text-sm">The basic building block of DNA. In this analyzer, we focus on Adenine (A), Cytosine (C), Guanine (G), and Thymine (T).</p>
+              <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
+                Nucleotide
+              </h3>
+              <p className='text-gray-600 text-sm'>
+                The basic building block of DNA. In this analyzer, we focus on
+                Adenine (A), Cytosine (C), Guanine (G), and Thymine (T).
+              </p>
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1">Mass %</h3>
-              <p className="text-gray-600 text-sm">The percentage of the total molecular weight contributed by specific nucleotides. C and G nucleotides are heavier and affect the stability of the DNA molecule.</p>
+              <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
+                Mass %
+              </h3>
+              <p className='text-gray-600 text-sm'>
+                The percentage of the total molecular weight contributed by
+                specific nucleotides. C and G nucleotides are heavier and affect
+                the stability of the DNA molecule.
+              </p>
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1">Protein</h3>
-              <p className="text-gray-600 text-sm">Large biomolecules and macromolecules that comprise one or more long chains of amino acid residues. In this context, we check if the DNA sequence has the potential to encode one.</p>
+              <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
+                Protein
+              </h3>
+              <p className='text-gray-600 text-sm'>
+                Large biomolecules and macromolecules that comprise one or more
+                long chains of amino acid residues. In this context, we check if
+                the DNA sequence has the potential to encode one.
+              </p>
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-gray-200 pt-8 text-center text-gray-500 text-sm pb-8">
+      <footer className='mt-20 border-t border-gray-200 pt-8 text-center text-gray-500 text-sm pb-8'>
         <p>&copy; 2025 Majid Hadji. All rights reserved.</p>
-        <p className="mt-2">DNA Sequence Analyzer Project for educational purposes</p>
-        <div className="mt-4 flex justify-center gap-6">
-          <button onClick={() => setShowAbout(true)} className="hover:text-blue-600 transition-colors">About</button>
-          <a href="#" className="hover:text-blue-600 transition-colors">Contact</a>
-          <a href="https://github.com/MajidHadji66/DNA" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">GitHub</a>
+        <p className='mt-2'>
+          DNA Sequence Analyzer Project For Educational Purposes
+        </p>
+        <div className='mt-4 flex justify-center gap-6'>
+          <button
+            onClick={() => setShowAbout(true)}
+            className='hover:text-blue-600 transition-colors'
+          >
+            About
+          </button>
+          <a href='#' className='hover:text-blue-600 transition-colors'>
+            Contact
+          </a>
+          <a
+            href='https://github.com/MajidHadji66/DNA'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:text-blue-600 transition-colors'
+          >
+            GitHub
+          </a>
         </div>
       </footer>
     </main>
