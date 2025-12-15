@@ -1,13 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     async rewrites() {
+        const apiUrl = process.env.API_URL;
+        const destination = apiUrl
+            ? `${apiUrl}/:path*`
+            : 'http://127.0.0.1:8000/:path*';
+
+        console.log(`[Next.js Config] Proxying /api requests to: ${destination}`);
+
         return [
             {
                 source: '/api/:path*',
-                destination: process.env.API_URL
-                    ? `${process.env.API_URL}/:path*`
-                    : 'http://127.0.0.1:8000/:path*', // Default to localhost for dev
-                // In Production (Cloud Run),ensure API_URL is set to your Backend Service URL.
+                destination: destination,
             },
         ]
     },
