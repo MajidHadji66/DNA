@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Upload,
   FileText,
@@ -8,6 +8,10 @@ import {
   Dna,
   CheckCircle,
   XCircle,
+  Clock,
+  Eye,
+  Download,
+  Trash2,
 } from "lucide-react";
 import {
   BarChart,
@@ -27,6 +31,36 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showAbout, setShowAbout] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [viewSequence, setViewSequence] = useState(null);
+
+  const fetchHistory = async () => {
+    try {
+      const response = await fetch("/api/history");
+      if (response.ok) {
+        const data = await response.json();
+        setHistory(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch history:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const deleteHistory = async (id) => {
+    if (!confirm("Are you sure you want to delete this report?")) return;
+    try {
+      const response = await fetch(`/api/history/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        setHistory(history.filter(item => item.id !== id));
+      }
+    } catch (error) {
+      console.error("Failed to delete history item:", error);
+    }
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -55,6 +89,7 @@ export default function Home() {
 
       const data = await response.json();
       setResult(data);
+      fetchHistory(); // Refresh history after new analysis
     } catch (err) {
       setError(err.message);
     } finally {
@@ -98,6 +133,50 @@ export default function Home() {
               <div className='pt-4 border-t border-gray-100'>
                 <p className='text-sm'>Version 1.0.0</p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sequence View Modal */}
+      {viewSequence && (
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full relative'>
+            <button
+              onClick={() => setViewSequence(null)}
+              className='absolute top-4 right-4 text-gray-400 hover:text-gray-600'
+            >
+              <XCircle size={24} />
+            </button>
+            <h2 className='text-xl font-bold text-gray-800 mb-4 flex items-center gap-2'>
+              <Dna className="text-blue-500" /> Full Sequence Content
+            </h2>
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 h-64 overflow-y-auto font-mono text-sm break-all text-gray-700">
+              {viewSequence}
+            </div>
+            <div className="mt-4 text-right flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  const blob = new Blob([viewSequence], { type: 'text/plain' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'sequence.txt';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium text-sm transition-colors"
+              >
+                <Download size={16} /> Download .txt
+              </button>
+              <button
+                onClick={() => setViewSequence(null)}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-800 font-medium text-sm transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -266,6 +345,97 @@ export default function Home() {
         </div>
       </div>
 
+
+
+      {/* History Section */}
+      {
+        history.length > 0 && (
+          <div className="mt-12 bg-white p-8 rounded-xl shadow-md">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <Clock className="text-purple-600" /> Recent Analysis History
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Time (UTC)</th>
+                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">File Name</th>
+                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Sequence Preview</th>
+                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Total Mass</th>
+                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Protein?</th>
+                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((record) => (
+                    <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-3 px-4 text-gray-600 text-sm">
+                        {new Date(record.timestamp).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-4 text-gray-700 font-medium text-sm">
+                        {record.filename || "-"}
+                      </td>
+                      <td className="py-3 px-4 font-mono text-xs text-gray-500 max-w-[150px] truncate" title={record.sequence}>
+                        {record.sequence}
+                      </td>
+                      <td className="py-3 px-4 text-gray-700 font-medium">
+                        {record.total_mass}
+                      </td>
+                      <td className="py-3 px-4">
+                        {record.is_protein ? (
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold">
+                            Yes
+                          </span>
+                        ) : (
+                          <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-bold">
+                            No
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-right flex items-center justify-end gap-3">
+                        <button
+                          onClick={() => {
+                            const reportContent = `DNA Analysis Report
+-------------------
+Timestamp: ${new Date(record.timestamp).toLocaleString()}
+Total Mass: ${record.total_mass}
+Is Protein: ${record.is_protein ? "YES" : "NO"}
+-------------------
+Sequence:
+${record.sequence}
+`;
+                            const blob = new Blob([reportContent], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `analysis_report_${record.id}.txt`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          }}
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          title="Download Report"
+                        >
+                          <Download size={18} />
+                        </button>
+                        <button
+                          onClick={() => deleteHistory(record.id)}
+                          className="text-red-500 hover:text-red-700 transition-colors"
+                          title="Delete Report"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
+      }
+
       {/* Education Section */}
       <div className='mt-12 grid grid-cols-1 md:grid-cols-2 gap-8'>
         {/* How It Works */}
@@ -394,6 +564,6 @@ export default function Home() {
           </a>
         </div>
       </footer>
-    </main>
+    </main >
   );
 }
