@@ -1,14 +1,8 @@
-from sqlalchemy import create_engine, text
-import os
-
-# Use the connection string
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "postgresql://neondb_owner:npg_vTOsoL0eg5lZ@ep-still-dew-adcibm7w-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
-)
+from sqlalchemy import text
+from database import engine
 
 def migrate():
-    engine = create_engine(DATABASE_URL)
+    # engine is already created in database.py with the correct URL
     with engine.connect() as connection:
         # Simple migration: Add column if it doesn't exist
         # note: postgres specific syntax
