@@ -162,11 +162,9 @@ export default function Home() {
           <div className="flex-1"></div> {/* Spacer for centering */}
           <div className='text-center flex-1'>
             <h1 className='text-4xl font-bold text-blue-900 mb-2 flex items-center justify-center gap-3'>
-              <Dna size={40} /> DNA Sequence Analyzer
+              <Dna size={60} /> DNA Sequence Analyzer
             </h1>
-            <p className='text-gray-600'>
-              Upload a DNA file to check for protein encoding potential
-            </p>
+
           </div>
           <div className="flex-1 flex justify-end">
             <div className="flex items-center gap-4">
@@ -273,7 +271,7 @@ export default function Home() {
       {/* Upload Section - Full Width */}
       <div className='bg-white p-12 rounded-xl shadow-lg mb-12 transform transition-all hover:scale-[1.01]'>
         <h2 className='text-3xl font-semibold mb-6 flex items-center gap-3 text-gray-800 justify-center'>
-          <Upload size={32} className="text-blue-500" /> Upload DNA Sequence
+          <Upload size={32} className="text-blue-500" />    Upload a DNA file to check for protein encoding potential
         </h2>
 
         <div
@@ -345,7 +343,7 @@ export default function Home() {
 
 
       {/* Education Section */}
-      <div className='mt-12 grid grid-cols-1 md:grid-cols-2 gap-8'>
+      <div className='mt-12'>
         {/* How It Works */}
         <div className='bg-white p-8 rounded-xl shadow-md border-t-4 border-blue-500'>
           <h2 className='text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2'>
@@ -398,52 +396,7 @@ export default function Home() {
           </ul>
         </div>
 
-        {/* Glossary */}
-        <div className='bg-slate-50 p-8 rounded-xl border border-slate-200'>
-          <h2 className='text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2'>
-            <FileText className='text-slate-500' /> Glossary
-          </h2>
-          <div className='space-y-5'>
-            <div>
-              <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
-                Codon
-              </h3>
-              <p className='text-gray-600 text-sm'>
-                A sequence of 3 nucleotides that corresponds to a specific amino
-                acid or stop signal during protein synthesis.
-              </p>
-            </div>
-            <div>
-              <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
-                Nucleotide
-              </h3>
-              <p className='text-gray-600 text-sm'>
-                The basic building block of DNA. In this analyzer, we focus on
-                Adenine (A), Cytosine (C), Guanine (G), and Thymine (T).
-              </p>
-            </div>
-            <div>
-              <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
-                Mass %
-              </h3>
-              <p className='text-gray-600 text-sm'>
-                The percentage of the total molecular weight contributed by
-                specific nucleotides. C and G nucleotides are heavier and affect
-                the stability of the DNA molecule.
-              </p>
-            </div>
-            <div>
-              <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
-                Protein
-              </h3>
-              <p className='text-gray-600 text-sm'>
-                Large biomolecules and macromolecules that comprise one or more
-                long chains of amino acid residues. In this context, we check if
-                the DNA sequence has the potential to encode one.
-              </p>
-            </div>
-          </div>
-        </div>
+
       </div>
 
       {/* Footer */}

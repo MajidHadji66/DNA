@@ -253,8 +253,56 @@ ${result.nucleotides}
                         ))}
                     </div>
                 </div>
+
+
+                {/* Glossary */}
+                <div className='bg-slate-50 p-8 rounded-xl border border-slate-200'>
+                    <h2 className='text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2'>
+                        <FileText className='text-slate-500' /> Glossary
+                    </h2>
+                    <div className='space-y-5'>
+                        <div>
+                            <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
+                                Codon
+                            </h3>
+                            <p className='text-gray-600 text-sm'>
+                                A sequence of 3 nucleotides that corresponds to a specific amino
+                                acid or stop signal during protein synthesis.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
+                                Nucleotide
+                            </h3>
+                            <p className='text-gray-600 text-sm'>
+                                The basic building block of DNA. In this analyzer, we focus on
+                                Adenine (A), Cytosine (C), Guanine (G), and Thymine (T).
+                            </p>
+                        </div>
+                        <div>
+                            <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
+                                Mass %
+                            </h3>
+                            <p className='text-gray-600 text-sm'>
+                                The percentage of the total molecular weight contributed by
+                                specific nucleotides. C and G nucleotides are heavier and affect
+                                the stability of the DNA molecule.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 className='font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1'>
+                                Protein
+                            </h3>
+                            <p className='text-gray-600 text-sm'>
+                                Large biomolecules and macromolecules that comprise one or more
+                                long chains of amino acid residues. In this context, we check if
+                                the DNA sequence has the potential to encode one.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <Footer />
-        </main>
+        </main >
     );
 }
