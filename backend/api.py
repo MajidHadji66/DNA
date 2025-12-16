@@ -5,7 +5,10 @@ import uvicorn
 from database import engine, Base, get_db, AnalysisResult
 from sqlalchemy.orm import Session
 from fastapi import Depends
+from migrate_db import migrate
 
+# Run migration to ensure table has 'filename' column
+migrate()
 
 app = FastAPI()
 
