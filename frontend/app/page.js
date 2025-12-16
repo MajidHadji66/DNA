@@ -84,8 +84,16 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Failed to analyze file");
+        let errorMsg = "Failed to analyze file";
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.detail || errorMsg;
+        } catch (e) {
+          // If JSON parsing fails, try reading as text (e.g. HTML error page)
+          const textBody = await response.text();
+          if (textBody) errorMsg = `Server Error: ${textBody.slice(0, 200)}`; // Truncate if too long
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
