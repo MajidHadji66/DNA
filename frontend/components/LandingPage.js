@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import Footer from "./Footer";
 import { Dna, ArrowRight, Shield, Activity, Database, Lock } from "lucide-react";
 
 export default function LandingPage({ onLogin }) {
@@ -52,9 +54,12 @@ export default function LandingPage({ onLogin }) {
                             >
                                 Access Dashboard <ArrowRight size={20} />
                             </button>
-                            <button className="px-8 py-4 bg-slate-800 hover:bg-slate-700/80 rounded-xl font-semibold text-lg border border-slate-700 transition-all flex items-center justify-center gap-2">
+                            <Link
+                                href="/docs"
+                                className="px-8 py-4 bg-slate-800 hover:bg-slate-700/80 rounded-xl font-semibold text-lg border border-slate-700 transition-all flex items-center justify-center gap-2"
+                            >
                                 View Documentation
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
@@ -129,6 +134,8 @@ export default function LandingPage({ onLogin }) {
                     </div>
                 </div>
             </main>
+
+            <Footer className="border-white/10 text-slate-400" />
         </div>
     );
 }

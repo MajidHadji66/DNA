@@ -32,6 +32,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import Footer from "../components/Footer";
 
 export default function Home() {
   const { user, logout, loading: authLoading } = useAuth();
@@ -658,31 +659,7 @@ ${record.sequence}
       </div>
 
       {/* Footer */}
-      <footer className='mt-20 border-t border-gray-200 pt-8 text-center text-gray-500 text-sm pb-8'>
-        <p>&copy; 2025 Majid Hadji. All rights reserved.</p>
-        <p className='mt-2'>
-          DNA Sequence Analyzer Project For Educational Purposes
-        </p>
-        <div className='mt-4 flex justify-center gap-6'>
-          <button
-            onClick={() => setShowAbout(true)}
-            className='hover:text-blue-600 transition-colors'
-          >
-            About
-          </button>
-          <a href='#' className='hover:text-blue-600 transition-colors'>
-            Contact
-          </a>
-          <a
-            href='https://github.com/MajidHadji66/DNA'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='hover:text-blue-600 transition-colors'
-          >
-            GitHub
-          </a>
-        </div>
-      </footer>
+      <Footer />
     </main >
   );
 }
