@@ -58,7 +58,10 @@ async def analyze_dna_endpoint(file: UploadFile = File(...), db: Session = Depen
         return results
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        traceback.print_exc() # Print full stack trace to Cloud Run logs
+        print(f"ERROR processing file: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
 @app.get("/history")
