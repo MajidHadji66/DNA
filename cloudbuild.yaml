@@ -5,7 +5,7 @@ steps:
   
   # Build the Frontend container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/dna-frontend', './frontend']
+    args: ['build', '--build-arg', 'API_URL=$_API_URL', '-t', 'gcr.io/$PROJECT_ID/dna-frontend', './frontend']
 
   # Push the Backend container image
   - name: 'gcr.io/cloud-builders/docker'
