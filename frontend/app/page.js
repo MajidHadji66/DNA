@@ -84,7 +84,8 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to analyze file");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Failed to analyze file");
       }
 
       const data = await response.json();
