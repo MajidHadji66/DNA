@@ -10,28 +10,12 @@ import {
   FileText,
   Activity,
   Dna,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Eye,
-  Download,
-  Trash2,
   AlertTriangle,
   User,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Clock
 } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
 import Footer from "../components/Footer";
 
 export default function Home() {
@@ -40,29 +24,16 @@ export default function Home() {
   const router = useRouter();
 
   const [file, setFile] = useState(null);
-  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showAbout, setShowAbout] = useState(false);
 
   // State variables
-  const [history, setHistory] = useState([]);
   const [viewSequence, setViewSequence] = useState(null);
   const [apiUrl, setApiUrl] = useState(null);
   const [dbError, setDbError] = useState(false);
 
-  const fetchHistory = async (url = apiUrl) => {
-    if (!url || !user) return; // Only fetch if user is logged in
-    try {
-      const response = await fetch(`${url}/history`);
-      if (response.ok) {
-        const data = await response.json();
-        setHistory(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch history:", error);
-    }
-  };
+
 
   const checkHealth = async (url) => {
     if (!url) return;
@@ -87,24 +58,13 @@ export default function Home() {
         .then((res) => res.json())
         .then((data) => {
           setApiUrl(data.apiUrl);
-          fetchHistory(data.apiUrl);
           checkHealth(data.apiUrl);
         })
         .catch((err) => console.error("Failed to load config:", err));
     }
   }, [user]);
 
-  const deleteHistory = async (id) => {
-    if (!confirm("Are you sure you want to delete this report?")) return;
-    try {
-      const response = await fetch(`${apiUrl}/history/${id}`, { method: "DELETE" });
-      if (response.ok) {
-        setHistory(history.filter(item => item.id !== id));
-      }
-    } catch (error) {
-      console.error("Failed to delete history item:", error);
-    }
-  };
+
 
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -143,9 +103,15 @@ export default function Home() {
         throw new Error(errorMsg);
       }
 
+
       const data = await response.json();
-      setResult(data);
-      fetchHistory(); // Refresh history after new analysis
+
+      // Redirect to result page
+      if (data.id) {
+        router.push(`/results/${data.id}`);
+      } else {
+        throw new Error("Invalid response from server");
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -210,6 +176,13 @@ export default function Home() {
               >
                 <User size={18} />
                 <span>{user.username}</span>
+              </button>
+              <button
+                onClick={() => router.push('/history')}
+                className="flex items-center gap-2 text-gray-700 hover:text-blue-600 font-medium transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100"
+              >
+                <Clock size={18} />
+                <span>History</span>
               </button>
               <button
                 onClick={logout}
@@ -297,264 +270,79 @@ export default function Home() {
         </div>
       )}
 
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        {/* Upload Section */}
-        <div className='md:col-span-1 bg-white p-6 rounded-xl shadow-md h-fit'>
-          <h2 className='text-xl font-semibold mb-4 flex items-center gap-2'>
-            <Upload size={20} /> Upload File
-          </h2>
+      {/* Upload Section - Full Width */}
+      <div className='bg-white p-12 rounded-xl shadow-lg mb-12 transform transition-all hover:scale-[1.01]'>
+        <h2 className='text-3xl font-semibold mb-6 flex items-center gap-3 text-gray-800 justify-center'>
+          <Upload size={32} className="text-blue-500" /> Upload DNA Sequence
+        </h2>
 
-          <div className='border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:bg-gray-50 transition-colors'>
-            <input
-              type='file'
-              id='file-upload'
-              className='hidden'
-              onChange={handleFileChange}
-              accept='.txt,.dna'
-            />
-            <label
-              htmlFor='file-upload'
-              className='cursor-pointer flex flex-col items-center'
+        <div
+          className={`border-4 border-dashed rounded-2xl p-16 text-center transition-all duration-300 ${file ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+            }`}
+        >
+          <input
+            type='file'
+            id='file-upload'
+            className='hidden'
+            onChange={handleFileChange}
+            accept='.txt,.dna'
+          />
+          <label
+            htmlFor='file-upload'
+            className='cursor-pointer flex flex-col items-center justify-center h-full'
+          >
+            {file ? (
+              <>
+                <FileText size={64} className='text-green-500 mb-4 animate-bounce' />
+                <span className='text-green-700 font-bold text-xl'>{file.name}</span>
+                <span className='text-sm text-green-600 mt-2'>Ready to analyze</span>
+              </>
+            ) : (
+              <>
+                <FileText size={80} className='text-gray-300 mb-4 group-hover:text-blue-400 transition-colors' />
+                <span className='text-xl text-gray-600 font-medium mb-2'>
+                  Drag and drop or <span className='text-blue-600 underline'>browse</span>
+                </span>
+                <span className='text-sm text-gray-400'>
+                  Supported formats: .txt, .dna
+                </span>
+              </>
+            )}
+          </label>
+        </div>
+
+        {file && (
+          <div className='mt-8 flex justify-center'>
+            <button
+              onClick={handleUpload}
+              disabled={loading}
+              className='bg-blue-600 text-white px-12 py-4 rounded-full text-lg font-bold shadow-lg hover:bg-blue-700 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all transform active:scale-95 flex items-center gap-3'
             >
-              <FileText size={48} className='text-gray-400 mb-2' />
-              <span className='text-blue-600 font-medium'>Choose a file</span>
-              <span className='text-xs text-gray-500 mt-1'>
-                .txt or .dna files
-              </span>
-            </label>
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Analyzing Sequence...
+                </>
+              ) : (
+                <>
+                  <Activity size={24} />
+                  Run Analysis
+                </>
+              )}
+            </button>
           </div>
+        )}
 
-          {file && (
-            <div className='mt-4 p-3 bg-blue-50 rounded-lg flex items-center justify-between'>
-              <span className='text-sm font-medium truncate'>{file.name}</span>
-              <button
-                onClick={handleUpload}
-                disabled={loading}
-                className='bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 transition-colors'
-              >
-                {loading ? "Analyzing..." : "Analyze"}
-              </button>
-            </div>
-          )}
-
-          {error && (
-            <div className='mt-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm'>
-              {error}
-            </div>
-          )}
-        </div>
-
-        {/* Results Section */}
-        <div className='md:col-span-2'>
-          {result ? (
-            <div className='space-y-6'>
-              {/* Status Card */}
-              <div
-                className={`p-6 rounded-xl shadow-md text-white flex items-center justify-between ${result.is_protein ? "bg-green-600" : "bg-red-500"
-                  }`}
-              >
-                <div>
-                  <h2 className='text-2xl font-bold'>
-                    {result.is_protein ? "Protein Detected" : "Not a Protein"}
-                  </h2>
-                  <p className='opacity-90'>
-                    {result.is_protein
-                      ? "This sequence meets all criteria for a valid protein."
-                      : "This sequence does not meet the criteria."}
-                  </p>
-                </div>
-                {result.is_protein ? (
-                  <CheckCircle size={48} />
-                ) : (
-                  <XCircle size={48} />
-                )}
-              </div>
-
-              {/* Stats Grid */}
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='bg-white p-5 rounded-xl shadow-sm'>
-                  <h3 className='text-gray-500 text-sm font-medium uppercase'>
-                    Total Mass
-                  </h3>
-                  <p className='text-3xl font-bold text-gray-800'>
-                    {result.total_mass}
-                  </p>
-                </div>
-                <div className='bg-white p-5 rounded-xl shadow-sm'>
-                  <h3 className='text-gray-500 text-sm font-medium uppercase'>
-                    Codon Count
-                  </h3>
-                  <p className='text-3xl font-bold text-gray-800'>
-                    {result.codons.length}
-                  </p>
-                </div>
-              </div>
-
-              <div className='bg-white p-6 rounded-xl shadow-md'>
-                <h3 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-                  <Activity size={20} /> Nucleotide Mass Distribution (%)
-                </h3>
-                <div className='h-64 w-full'>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={[
-                        { name: 'A', value: result.mass_percentages[0], color: '#ef4444' },
-                        { name: 'C', value: result.mass_percentages[1], color: '#f59e0b' },
-                        { name: 'T', value: result.mass_percentages[2], color: '#3b82f6' },
-                        { name: 'G', value: result.mass_percentages[3], color: '#22c55e' },
-                      ]}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="value" name="Mass %">
-                        {
-                          [
-                            { name: 'A', color: '#ef4444' }, // Red
-                            { name: 'C', color: '#f59e0b' }, // Yellow
-                            { name: 'T', color: '#3b82f6' }, // Blue
-                            { name: 'G', color: '#22c55e' }, // Green
-                          ].map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))
-                        }
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                {/* Raw Counts Footer */}
-                <div className='grid grid-cols-4 gap-2 text-center mt-4 pt-4 border-t border-gray-100'>
-                  {["A", "C", "T", "G"].map((nuc, idx) => (
-                    <div key={nuc}>
-                      <div className='text-xs font-bold text-gray-400'>{nuc} Count</div>
-                      <div className='text-gray-600 font-mono'>{result.counts[idx]}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Codons List */}
-              <div className='bg-white p-6 rounded-xl shadow-md'>
-                <h3 className='text-lg font-semibold mb-4'>Codon Sequence</h3>
-                <div className='flex flex-wrap gap-2 font-mono text-sm'>
-                  {result.codons.map((codon, i) => (
-                    <span
-                      key={i}
-                      className='bg-gray-100 px-2 py-1 rounded text-gray-700'
-                    >
-                      {codon}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className='bg-white p-12 rounded-xl shadow-md text-center h-full flex flex-col items-center justify-center text-gray-400'>
-              <Dna size={64} className='mb-4 opacity-20' />
-              <p>Upload a file to see the analysis results here.</p>
-            </div>
-          )}
-        </div>
+        {error && (
+          <div className='mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center font-medium animate-pulse'>
+            {error}
+          </div>
+        )}
       </div>
 
 
 
-      {/* History Section */}
-      {
-        history.length > 0 && (
-          <div className="mt-12 bg-white p-8 rounded-xl shadow-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <Clock className="text-purple-600" /> Recent Analysis History
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Time (UTC)</th>
-                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">User</th>
-                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">File Name</th>
-                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Sequence Preview</th>
-                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Total Mass</th>
-                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Protein?</th>
-                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.map((record) => (
-                    <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 text-gray-600 text-sm">
-                        {new Date(record.timestamp).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-4 text-gray-600 text-sm font-medium">
-                        {record.username || "Anonymous"}
-                      </td>
-                      <td className="py-3 px-4 text-gray-700 font-medium text-sm">
-                        {record.filename || "-"}
-                      </td>
-                      <td className="py-3 px-4 font-mono text-xs text-gray-500 max-w-[150px] truncate" title={record.sequence}>
-                        {record.sequence}
-                      </td>
-                      <td className="py-3 px-4 text-gray-700 font-medium">
-                        {record.total_mass}
-                      </td>
-                      <td className="py-3 px-4">
-                        {record.is_protein ? (
-                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold">
-                            Yes
-                          </span>
-                        ) : (
-                          <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-bold">
-                            No
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-right flex items-center justify-end gap-3">
-                        <button
-                          onClick={() => {
-                            const reportContent = `DNA Analysis Report
--------------------
-Timestamp: ${new Date(record.timestamp).toLocaleString()}
-User: ${record.username || "Anonymous"}
-Total Mass: ${record.total_mass}
-Is Protein: ${record.is_protein ? "YES" : "NO"}
--------------------
-Sequence:
-${record.sequence}
-`;
-                            const blob = new Blob([reportContent], { type: 'text/plain' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `analysis_report_${record.id}.txt`;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                          }}
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
-                          title="Download Report"
-                        >
-                          <Download size={18} />
-                        </button>
-                        <button
-                          onClick={() => deleteHistory(record.id)}
-                          className="text-red-500 hover:text-red-700 transition-colors"
-                          title="Delete Report"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )
-      }
+
 
       {/* Education Section */}
       <div className='mt-12 grid grid-cols-1 md:grid-cols-2 gap-8'>

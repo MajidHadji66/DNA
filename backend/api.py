@@ -61,6 +61,10 @@ async def analyze_dna_endpoint(
         db.commit()
         db.refresh(db_record)
         
+        # Include ID in the response
+        results["id"] = db_record.id
+        results["timestamp"] = db_record.timestamp.isoformat() if db_record.timestamp else None
+        
         return results
 
     except Exception as e:
@@ -75,6 +79,31 @@ def get_history(db: Session = Depends(get_db)):
     # Fetch the last 10 analysis records
     history = db.query(AnalysisResult).order_by(AnalysisResult.timestamp.desc()).limit(10).all()
     return history
+
+
+@app.get("/history/{item_id}")
+def get_history_item(item_id: int, db: Session = Depends(get_db)):
+    item = db.query(AnalysisResult).filter(AnalysisResult.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    # Reconstruct the response format expected by the frontend
+    # Note: We are storing counts/mass_percentages implicitly or need to re-calculate?
+    # The database model stores: filename, sequence, is_protein, total_mass, username, timestamp
+    # We need to re-run the calculation or store more data to fully reproduce the charts.
+    # Looking at dna.py, re-running analysis on the stored sequence is safe and cheap.
+    
+    # Import dna logic to re-calculate stats for the visualization
+    nucleotides = list(item.sequence)
+    results = dna.analyze_dna_sequence(nucleotides)
+    
+    # Merge with DB info
+    results["id"] = item.id
+    results["filename"] = item.filename
+    results["username"] = item.username
+    results["timestamp"] = item.timestamp
+    
+    return results
 
 
 @app.delete("/history/{item_id}")
