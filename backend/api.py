@@ -4,6 +4,7 @@ import dna
 import uvicorn
 from database import engine, Base, get_db, AnalysisResult
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from fastapi import Depends
 from migrate_db import migrate
 
@@ -79,6 +80,17 @@ def delete_history_item(item_id: int, db: Session = Depends(get_db)):
     db.delete(item)
     db.commit()
     return {"message": "Deleted successfully"}
+
+
+@app.get("/health")
+def health_check(db: Session = Depends(get_db)):
+    try:
+        # execute a simple query to check the connection
+        db.execute(text("SELECT 1"))
+        return {"status": "healthy"}
+    except Exception as e:
+        print(f"Health check failed: {e}")
+        raise HTTPException(status_code=503, detail="Database connection unavailable")
 
 
 

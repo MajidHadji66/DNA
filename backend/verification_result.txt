@@ -1,1 +1,4 @@
-ImportError: No module named 'dotenv'
+Testing /health endpoint...
+Status Code: 200
+Response: {'status': 'healthy'}
+PASS: Endpoint is reachable and returned valid status.

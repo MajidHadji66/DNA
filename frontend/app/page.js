@@ -12,6 +12,7 @@ import {
   Eye,
   Download,
   Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,9 +32,12 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showAbout, setShowAbout] = useState(false);
+
+  // State variables
   const [history, setHistory] = useState([]);
   const [viewSequence, setViewSequence] = useState(null);
   const [apiUrl, setApiUrl] = useState(null);
+  const [dbError, setDbError] = useState(false);
 
   const fetchHistory = async (url = apiUrl) => {
     if (!url) return;
@@ -48,6 +52,22 @@ export default function Home() {
     }
   };
 
+  const checkHealth = async (url) => {
+    if (!url) return;
+    try {
+      const response = await fetch(`${url}/health`);
+      if (response.status === 503) {
+        setDbError(true);
+      } else {
+        setDbError(false);
+      }
+    } catch (error) {
+      console.error("Health check failed:", error);
+      // If we can't reach the backend at all, that's also an error
+      setDbError(true);
+    }
+  };
+
   useEffect(() => {
     // Fetch config to get Backend URL
     fetch("/api/config")
@@ -55,6 +75,7 @@ export default function Home() {
       .then((data) => {
         setApiUrl(data.apiUrl);
         fetchHistory(data.apiUrl);
+        checkHealth(data.apiUrl);
       })
       .catch((err) => console.error("Failed to load config:", err));
   }, []);
@@ -117,6 +138,20 @@ export default function Home() {
 
   return (
     <main className='min-h-screen p-8 max-w-6xl mx-auto'>
+      {/* Database Connection Error Banner */}
+      {dbError && (
+        <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r shadow-sm flex items-start gap-3">
+          <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={24} />
+          <div>
+            <h3 className="text-red-800 font-bold">Database Connection Issue</h3>
+            <p className="text-red-700 text-sm mt-1">
+              Warning: The application is currently unable to connect to the database.
+              History features and saving new analyses may be unavailable.
+            </p>
+          </div>
+        </div>
+      )}
+
       <header className='mb-10 text-center'>
         <h1 className='text-4xl font-bold text-blue-900 mb-2 flex items-center justify-center gap-3'>
           <Dna size={40} /> DNA Sequence Analyzer
