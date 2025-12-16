@@ -8,8 +8,9 @@ def migrate():
         # note: postgres specific syntax
         try:
             connection.execute(text("ALTER TABLE analysis_history ADD COLUMN IF NOT EXISTS filename VARCHAR;"))
+            connection.execute(text("ALTER TABLE analysis_history ADD COLUMN IF NOT EXISTS username VARCHAR;"))
             connection.commit() # Important for some drivers
-            print("Migration successful: Added 'filename' column.")
+            print("Migration successful: Added 'filename' and 'username' columns.")
         except Exception as e:
             print(f"Migration failed (might already exist or other error): {e}")
 

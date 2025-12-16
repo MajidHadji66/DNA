@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "./context/AuthContext";
+import { useRouter } from "next/navigation";
+import LoginDialog from "../components/LoginDialog";
+import LandingPage from "../components/LandingPage";
 import {
   Upload,
   FileText,
@@ -13,6 +17,9 @@ import {
   Download,
   Trash2,
   AlertTriangle,
+  User,
+  LogOut,
+  ChevronDown
 } from "lucide-react";
 import {
   BarChart,
@@ -27,6 +34,10 @@ import {
 } from "recharts";
 
 export default function Home() {
+  const { user, logout, loading: authLoading } = useAuth();
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const router = useRouter();
+
   const [file, setFile] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -40,7 +51,7 @@ export default function Home() {
   const [dbError, setDbError] = useState(false);
 
   const fetchHistory = async (url = apiUrl) => {
-    if (!url) return;
+    if (!url || !user) return; // Only fetch if user is logged in
     try {
       const response = await fetch(`${url}/history`);
       if (response.ok) {
@@ -69,16 +80,18 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Fetch config to get Backend URL
-    fetch("/api/config")
-      .then((res) => res.json())
-      .then((data) => {
-        setApiUrl(data.apiUrl);
-        fetchHistory(data.apiUrl);
-        checkHealth(data.apiUrl);
-      })
-      .catch((err) => console.error("Failed to load config:", err));
-  }, []);
+    // Only fetch config and data if user is authenticated
+    if (user) {
+      fetch("/api/config")
+        .then((res) => res.json())
+        .then((data) => {
+          setApiUrl(data.apiUrl);
+          fetchHistory(data.apiUrl);
+          checkHealth(data.apiUrl);
+        })
+        .catch((err) => console.error("Failed to load config:", err));
+    }
+  }, [user]);
 
   const deleteHistory = async (id) => {
     if (!confirm("Are you sure you want to delete this report?")) return;
@@ -106,6 +119,9 @@ export default function Home() {
     setError(null);
     const formData = new FormData();
     formData.append("file", file);
+    if (user?.username) {
+      formData.append("username", user.username);
+    }
 
     try {
       const response = await fetch(`${apiUrl}/analyze`, {
@@ -136,8 +152,30 @@ export default function Home() {
     }
   };
 
+  // Loading state for auth check
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Not logged in -> Show Landing Page
+  if (!user) {
+    return (
+      <>
+        <LandingPage onLogin={() => setIsLoginOpen(true)} />
+        <LoginDialog isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      </>
+    );
+  }
+
+  // Logged in -> Show Dashboard
   return (
     <main className='min-h-screen p-8 max-w-6xl mx-auto'>
+      <LoginDialog isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+
       {/* Database Connection Error Banner */}
       {dbError && (
         <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r shadow-sm flex items-start gap-3">
@@ -152,13 +190,36 @@ export default function Home() {
         </div>
       )}
 
-      <header className='mb-10 text-center'>
-        <h1 className='text-4xl font-bold text-blue-900 mb-2 flex items-center justify-center gap-3'>
-          <Dna size={40} /> DNA Sequence Analyzer
-        </h1>
-        <p className='text-gray-600'>
-          Upload a DNA file to check for protein encoding potential
-        </p>
+      <header className='mb-10'>
+        <div className="flex justify-between items-start">
+          <div className="flex-1"></div> {/* Spacer for centering */}
+          <div className='text-center flex-1'>
+            <h1 className='text-4xl font-bold text-blue-900 mb-2 flex items-center justify-center gap-3'>
+              <Dna size={40} /> DNA Sequence Analyzer
+            </h1>
+            <p className='text-gray-600'>
+              Upload a DNA file to check for protein encoding potential
+            </p>
+          </div>
+          <div className="flex-1 flex justify-end">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push('/profile')}
+                className="flex items-center gap-2 text-gray-700 hover:text-blue-600 font-medium transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100"
+              >
+                <User size={18} />
+                <span>{user.username}</span>
+              </button>
+              <button
+                onClick={logout}
+                className="text-gray-400 hover:text-red-500 transition-colors p-2"
+                title="Sign Out"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
       </header>
 
       {/* About Modal */}
@@ -412,6 +473,7 @@ export default function Home() {
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Time (UTC)</th>
+                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">User</th>
                     <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">File Name</th>
                     <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Sequence Preview</th>
                     <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Total Mass</th>
@@ -424,6 +486,9 @@ export default function Home() {
                     <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-3 px-4 text-gray-600 text-sm">
                         {new Date(record.timestamp).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-4 text-gray-600 text-sm font-medium">
+                        {record.username || "Anonymous"}
                       </td>
                       <td className="py-3 px-4 text-gray-700 font-medium text-sm">
                         {record.filename || "-"}
@@ -451,6 +516,7 @@ export default function Home() {
                             const reportContent = `DNA Analysis Report
 -------------------
 Timestamp: ${new Date(record.timestamp).toLocaleString()}
+User: ${record.username || "Anonymous"}
 Total Mass: ${record.total_mass}
 Is Protein: ${record.is_protein ? "YES" : "NO"}
 -------------------

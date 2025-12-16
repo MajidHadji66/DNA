@@ -30,6 +30,7 @@ class AnalysisResult(Base):
     sequence = Column(String, index=True)
     is_protein = Column(Boolean)
     total_mass = Column(String) # Storing as string to keep it simple, or Float if preferred
+    username = Column(String, index=True, nullable=True) # Added username
 
 def get_db():
     db = SessionLocal()

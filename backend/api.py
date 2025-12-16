@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 import dna
 import uvicorn
@@ -27,7 +27,11 @@ Base.metadata.create_all(bind=engine)
 
 
 @app.post("/analyze")
-async def analyze_dna_endpoint(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def analyze_dna_endpoint(
+    file: UploadFile = File(...), 
+    username: str = Form(None), # Accept username as form field
+    db: Session = Depends(get_db)
+):
 
     try:
         content = await file.read()
@@ -50,7 +54,8 @@ async def analyze_dna_endpoint(file: UploadFile = File(...), db: Session = Depen
             filename=file.filename,
             sequence=results["nucleotides"],
             is_protein=results["is_protein"],
-            total_mass=str(results["total_mass"])
+            total_mass=str(results["total_mass"]),
+            username=username
         )
         db.add(db_record)
         db.commit()
