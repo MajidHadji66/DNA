@@ -49,3 +49,6 @@ steps:
 # when using a custom service account.
 options:
   logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _API_URL: '' # User must override this in Cloud Build Trigger settings
