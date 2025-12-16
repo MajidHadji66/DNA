@@ -33,10 +33,12 @@ export default function Home() {
   const [showAbout, setShowAbout] = useState(false);
   const [history, setHistory] = useState([]);
   const [viewSequence, setViewSequence] = useState(null);
+  const [apiUrl, setApiUrl] = useState(null);
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (url = apiUrl) => {
+    if (!url) return;
     try {
-      const response = await fetch("/api/history");
+      const response = await fetch(`${url}/history`);
       if (response.ok) {
         const data = await response.json();
         setHistory(data);
@@ -47,13 +49,20 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchHistory();
+    // Fetch config to get Backend URL
+    fetch("/api/config")
+      .then((res) => res.json())
+      .then((data) => {
+        setApiUrl(data.apiUrl);
+        fetchHistory(data.apiUrl);
+      })
+      .catch((err) => console.error("Failed to load config:", err));
   }, []);
 
   const deleteHistory = async (id) => {
     if (!confirm("Are you sure you want to delete this report?")) return;
     try {
-      const response = await fetch(`/api/history/${id}`, { method: "DELETE" });
+      const response = await fetch(`${apiUrl}/history/${id}`, { method: "DELETE" });
       if (response.ok) {
         setHistory(history.filter(item => item.id !== id));
       }
@@ -78,7 +87,7 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/analyze", {
+      const response = await fetch(`${apiUrl}/analyze`, {
         method: "POST",
         body: formData,
       });
