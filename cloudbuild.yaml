@@ -44,6 +44,8 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'API_URL=$_API_URL'
 
 # Use specific logging option to avoid needing a user-owned logs bucket
 # when using a custom service account.

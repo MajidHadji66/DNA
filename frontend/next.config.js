@@ -6,8 +6,6 @@ const nextConfig = {
             ? `${apiUrl}/:path*`
             : 'http://127.0.0.1:8000/:path*';
 
-        console.log(`[Next.js Config] Proxying /api requests to: ${destination}`);
-
         return [
             {
                 source: '/api/:path*',
