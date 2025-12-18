@@ -11,7 +11,10 @@ import {
     AlertTriangle,
     LogOut,
     User,
-    ArrowLeft
+    ArrowLeft,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown
 } from "lucide-react";
 import Footer from "../../components/Footer"; // Adjusted path
 
@@ -32,6 +35,34 @@ export default function HistoryPage() {
     const [history, setHistory] = useState<HistoryRecord[]>([]);
     const [apiUrl, setApiUrl] = useState<string | null>(null);
     const [dbError, setDbError] = useState(false);
+    const [sortConfig, setSortConfig] = useState<{ key: keyof HistoryRecord; direction: 'asc' | 'desc' }>({
+        key: 'timestamp',
+        direction: 'desc'
+    });
+
+    const sortedHistory = [...history].sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+            return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+            return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+
+    const requestSort = (key: keyof HistoryRecord) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const GetSortIcon = ({ columnKey }: { columnKey: keyof HistoryRecord }) => {
+        if (sortConfig.key !== columnKey) return <ArrowUpDown size={14} className="ml-1 text-gray-400" />;
+        if (sortConfig.direction === 'asc') return <ArrowUp size={14} className="ml-1 text-blue-600" />;
+        return <ArrowDown size={14} className="ml-1 text-blue-600" />;
+    };
 
     const fetchHistory = async (url: string | null = apiUrl) => {
         if (!url || !user) return; // Only fetch if user is logged in
@@ -156,17 +187,57 @@ export default function HistoryPage() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b border-gray-200">
-                                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Time (UTC)</th>
-                                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">User</th>
-                                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">File Name</th>
+                                    <th
+                                        className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase cursor-pointer hover:bg-gray-50 transition-colors select-none"
+                                        onClick={() => requestSort('timestamp')}
+                                    >
+                                        <div className="flex items-center">
+                                            Time (UTC)
+                                            <GetSortIcon columnKey="timestamp" />
+                                        </div>
+                                    </th>
+                                    <th
+                                        className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase cursor-pointer hover:bg-gray-50 transition-colors select-none"
+                                        onClick={() => requestSort('username')}
+                                    >
+                                        <div className="flex items-center">
+                                            User
+                                            <GetSortIcon columnKey="username" />
+                                        </div>
+                                    </th>
+                                    <th
+                                        className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase cursor-pointer hover:bg-gray-50 transition-colors select-none"
+                                        onClick={() => requestSort('filename')}
+                                    >
+                                        <div className="flex items-center">
+                                            File Name
+                                            <GetSortIcon columnKey="filename" />
+                                        </div>
+                                    </th>
                                     <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Sequence Preview</th>
-                                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Total Mass</th>
-                                    <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase">Protein?</th>
+                                    <th
+                                        className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase cursor-pointer hover:bg-gray-50 transition-colors select-none"
+                                        onClick={() => requestSort('total_mass')}
+                                    >
+                                        <div className="flex items-center">
+                                            Total Mass
+                                            <GetSortIcon columnKey="total_mass" />
+                                        </div>
+                                    </th>
+                                    <th
+                                        className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase cursor-pointer hover:bg-gray-50 transition-colors select-none"
+                                        onClick={() => requestSort('is_protein')}
+                                    >
+                                        <div className="flex items-center">
+                                            Protein?
+                                            <GetSortIcon columnKey="is_protein" />
+                                        </div>
+                                    </th>
                                     <th className="py-3 px-4 text-gray-600 font-semibold text-sm uppercase text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {history.map((record) => (
+                                {sortedHistory.map((record) => (
                                     <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
                                         <td className="py-3 px-4 text-gray-600 text-sm">
                                             {new Date(record.timestamp).toLocaleString()}
