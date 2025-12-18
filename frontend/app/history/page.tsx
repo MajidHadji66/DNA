@@ -302,8 +302,9 @@ ${record.sequence}
                                             </button>
                                             <button
                                                 onClick={() => deleteHistory(record.id)}
-                                                className="text-red-500 hover:text-red-700 transition-colors"
-                                                title="Delete Report"
+                                                disabled={user.username !== 'admin'}
+                                                className={`text-red-500 transition-colors ${user.username !== 'admin' ? 'opacity-30 cursor-not-allowed' : 'hover:text-red-700'}`}
+                                                title={user.username !== 'admin' ? "You don't have admin privilege" : "Delete Report"}
                                             >
                                                 <Trash2 size={18} />
                                             </button>
