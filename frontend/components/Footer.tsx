@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { Github, Mail, Info } from "lucide-react";
 
-export default function Footer({ className = "" }) {
+interface FooterProps {
+    className?: string;
+}
+
+export default function Footer({ className = "" }: FooterProps) {
     return (
         <footer className={`mt-20 border-t border-gray-200 pt-8 text-center text-gray-500 text-sm pb-8 ${className}`}>
             <p>&copy; {new Date().getFullYear()} Majid Hadji. All rights reserved.</p>

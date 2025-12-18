@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAuth } from "./context/AuthContext";
+import { useState, useEffect, ChangeEvent } from "react";
+import { useAuth, User } from "./context/AuthContext";
 import { useRouter } from "next/navigation";
 import LoginDialog from "../components/LoginDialog";
 import LandingPage from "../components/LandingPage";
@@ -11,10 +11,12 @@ import {
   Activity,
   Dna,
   AlertTriangle,
-  User,
+  User as UserIcon,
   LogOut,
   ChevronDown,
-  Clock
+  Clock,
+  XCircle,
+  Download
 } from "lucide-react";
 import Footer from "../components/Footer";
 
@@ -35,7 +37,7 @@ export default function Home() {
 
 
 
-  const checkHealth = async (url) => {
+  const checkHealth = async (url: string) => {
     if (!url) return;
     try {
       const response = await fetch(`${url}/health`);
@@ -66,7 +68,7 @@ export default function Home() {
 
 
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFile(e.target.files[0]);
       setError(null);
@@ -172,7 +174,7 @@ export default function Home() {
                 onClick={() => router.push('/profile')}
                 className="flex items-center gap-2 text-gray-700 hover:text-blue-600 font-medium transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100"
               >
-                <User size={18} />
+                <UserIcon size={18} />
                 <span>{user.username}</span>
               </button>
               <button

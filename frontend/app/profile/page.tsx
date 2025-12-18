@@ -3,7 +3,7 @@
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { User, Shield, Calendar, ArrowLeft } from "lucide-react";
+import { User as UserIcon, Shield, Calendar, ArrowLeft } from "lucide-react";
 
 export default function ProfilePage() {
     const { user, loading } = useAuth();
@@ -40,7 +40,7 @@ export default function ProfilePage() {
                         <div className="absolute -bottom-12 left-8">
                             <div className="bg-white p-1 rounded-full">
                                 <div className="bg-gray-100 rounded-full p-4 border-4 border-white">
-                                    <User size={48} className="text-gray-600" />
+                                    <UserIcon size={48} className="text-gray-600" />
                                 </div>
                             </div>
                         </div>

@@ -11,7 +11,7 @@ A full-stack web application that analyzes DNA sequences to determine their pote
 
 ## 🛠️ Tech Stack
 
--   **Frontend**: Next.js 14, React, Tailwind CSS, Lucide Icons.
+-   **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS, Lucide Icons.
 -   **Backend**: Python 3.10+, FastAPI, Uvicorn.
 
 ## 📋 Prerequisites

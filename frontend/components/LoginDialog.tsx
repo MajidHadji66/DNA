@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { X, LogIn } from "lucide-react";
 import { useAuth } from "../app/context/AuthContext";
 
-export default function LoginDialog({ isOpen, onClose }) {
+interface LoginDialogProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export default function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -12,7 +17,7 @@ export default function LoginDialog({ isOpen, onClose }) {
 
     if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         setError("");
         try {

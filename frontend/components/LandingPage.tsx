@@ -4,7 +4,11 @@ import Link from "next/link";
 import Footer from "./Footer";
 import { Dna, ArrowRight, Shield, Activity, Database, Lock } from "lucide-react";
 
-export default function LandingPage({ onLogin }) {
+interface LandingPageProps {
+    onLogin: () => void;
+}
+
+export default function LandingPage({ onLogin }: LandingPageProps) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white overflow-hidden relative">
             {/* Background Elements */}

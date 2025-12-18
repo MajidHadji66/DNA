@@ -1,11 +1,24 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-const AuthContext = createContext();
+export interface User {
+    username: string;
+    role: string;
+    joined: string;
+}
 
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+interface AuthContextType {
+    user: User | null;
+    loading: boolean;
+    login: (username: string, password: string) => void;
+    logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,12 +30,12 @@ export function AuthProvider({ children }) {
         setLoading(false);
     }, []);
 
-    const login = (username, password) => {
+    const login = (username: string, password: string) => {
         if (!username || !password) {
             throw new Error("Username and password are required");
         }
         // Mock login - accept any non-empty input
-        const newUser = { username, role: "Researcher", joined: new Date().toISOString() };
+        const newUser: User = { username, role: "Researcher", joined: new Date().toISOString() };
         setUser(newUser);
         localStorage.setItem("dna_user", JSON.stringify(newUser));
     };
@@ -40,5 +53,9 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-    return useContext(AuthContext);
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
 }

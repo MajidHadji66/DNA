@@ -5,7 +5,7 @@ This document provides a technical overview of the DNA Sequence Analyzer applica
 ## 1. System Overview
 
 The application is a full-stack web platform consisting of:
-*   **Frontend**: Built with **Next.js 14** (App Router), React, and Tailwind CSS.
+*   **Frontend**: Built with **Next.js 14** (App Router), React, TypeScript, and Tailwind CSS.
 *   **Backend**: A **Python FastAPI** service processing DNA logic.
 *   **Database**: **PostgreSQL** (via specific connection string) accessed using **SQLAlchemy**.
 *   **Authentication**: A custom context-based mock authentication system.
@@ -43,7 +43,7 @@ graph TD
 ## 2. Frontend Architecture (`/frontend`)
 
 ### Core Technologies
-*   **Next.js App Router**: Uses file-system based routing (`app/page.js`, `app/docs/page.js`).
+*   **Next.js App Router**: Uses file-system based routing (`app/page.tsx`, `app/docs/page.tsx`).
 *   **Client Components**: Most interactive pages use `"use client"` for state management.
 *   **Tailwind CSS**: Utility-first styling for responsive design.
 *   **Lucide React**: Iconography.
@@ -51,7 +51,7 @@ graph TD
 
 ### Key Components
 
-#### 1. Context & State Management (`AuthContext.js`)
+#### 1. Context & State Management (`AuthContext.tsx`)
 *   **Purpose**: Manages global user authentication state.
 *   **Implementation**: 
     *   Uses `React.createContext`.
@@ -59,7 +59,7 @@ graph TD
     *   Exposes `login()`, `logout()`, `user` object, and `loading` state.
 *   **Why**: avoids prop drilling user data through every component.
 
-#### 2. Root Page Logic (`app/page.js`)
+#### 2. Root Page Logic (`app/page.tsx`)
 *   **Conditional Rendering**: 
     *   If `!user`: Renders the `<LandingPage />` component.
     *   If `user`: Renders the main Dashboard (Upload form, Charts, Tables).
@@ -68,9 +68,9 @@ graph TD
 *   **Report Generation**: Use browser-native `Blob` and `URL.createObjectURL` to generate `.txt` reports on the client side without needing a backend download endpoint.
 
 #### 3. Reusable Components
-*   **`LoginDialog.js`**: A modal using fixed positioning and z-indexing. Handles the form submission using the `login` function from `AuthContext`.
-*   **`Footer.js`**: A shared footer component used across the Dashboard, Landing Page, and Documentation.
-*   **`LandingPage.js`**: A presentation-heavy component with CSS animations (gradients, blur effects).
+*   **`LoginDialog.tsx`**: A modal using fixed positioning and z-indexing. Handles the form submission using the `login` function from `AuthContext`.
+*   **`Footer.tsx`**: A shared footer component used across the Dashboard, Landing Page, and Documentation.
+*   **`LandingPage.tsx`**: A presentation-heavy component with CSS animations (gradients, blur effects).
 
 ---
 

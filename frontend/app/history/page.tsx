@@ -15,15 +15,25 @@ import {
 } from "lucide-react";
 import Footer from "../../components/Footer"; // Adjusted path
 
+interface HistoryRecord {
+    id: number;
+    timestamp: string;
+    username: string;
+    filename: string;
+    sequence: string;
+    total_mass: number;
+    is_protein: boolean;
+}
+
 export default function HistoryPage() {
     const { user, logout, loading: authLoading } = useAuth();
     const router = useRouter();
 
-    const [history, setHistory] = useState([]);
-    const [apiUrl, setApiUrl] = useState(null);
+    const [history, setHistory] = useState<HistoryRecord[]>([]);
+    const [apiUrl, setApiUrl] = useState<string | null>(null);
     const [dbError, setDbError] = useState(false);
 
-    const fetchHistory = async (url = apiUrl) => {
+    const fetchHistory = async (url: string | null = apiUrl) => {
         if (!url || !user) return; // Only fetch if user is logged in
         try {
             const response = await fetch(`${url}/history`);
@@ -36,7 +46,7 @@ export default function HistoryPage() {
         }
     };
 
-    const checkHealth = async (url) => {
+    const checkHealth = async (url: string) => {
         if (!url) return;
         try {
             const response = await fetch(`${url}/health`);
@@ -68,7 +78,7 @@ export default function HistoryPage() {
         }
     }, [user, authLoading, router]);
 
-    const deleteHistory = async (id) => {
+    const deleteHistory = async (id: number) => {
         if (!confirm("Are you sure you want to delete this report?")) return;
         try {
             const response = await fetch(`${apiUrl}/history/${id}`, { method: "DELETE" });
