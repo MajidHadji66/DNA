@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext"; // Adjusted path
+import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import {
     Clock,
     Download,
     Trash2,
     Eye,
-    AlertTriangle,
     LogOut,
     User,
     ArrowLeft,
@@ -16,109 +15,48 @@ import {
     ArrowUp,
     ArrowDown
 } from "lucide-react";
-import Footer from "../../components/Footer"; // Adjusted path
-
-interface HistoryRecord {
-    id: number;
-    timestamp: string;
-    username: string;
-    filename: string;
-    sequence: string;
-    total_mass: number;
-    is_protein: boolean;
-}
+import Footer from "../../components/Footer";
+import DbConnectionBanner from "../../components/DbConnectionBanner";
+import { useHealthCheck } from "../../hooks/useHealthCheck";
+import { useHistory, HistoryRecord } from "../../hooks/useHistory";
 
 export default function HistoryPage() {
     const { user, logout, loading: authLoading } = useAuth();
     const router = useRouter();
 
-    const [history, setHistory] = useState<HistoryRecord[]>([]);
     const [apiUrl, setApiUrl] = useState<string | null>(null);
-    const [dbError, setDbError] = useState(false);
-    const [sortConfig, setSortConfig] = useState<{ key: keyof HistoryRecord; direction: 'asc' | 'desc' }>({
-        key: 'timestamp',
-        direction: 'desc'
-    });
 
-    const sortedHistory = [...history].sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-            return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-            return sortConfig.direction === 'asc' ? 1 : -1;
-        }
-        return 0;
-    });
+    // Custom Hooks
+    const { dbError } = useHealthCheck(apiUrl);
+    const {
+        history,
+        sortedHistory,
+        sortConfig,
+        requestSort,
+        deleteHistory,
+        downloadReport,
+        refreshHistory
+    } = useHistory(apiUrl, user);
 
-    const requestSort = (key: keyof HistoryRecord) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const GetSortIcon = ({ columnKey }: { columnKey: keyof HistoryRecord }) => {
-        if (sortConfig.key !== columnKey) return <ArrowUpDown size={14} className="ml-1 text-gray-400" />;
-        if (sortConfig.direction === 'asc') return <ArrowUp size={14} className="ml-1 text-blue-600" />;
-        return <ArrowDown size={14} className="ml-1 text-blue-600" />;
-    };
-
-    const fetchHistory = async (url: string | null = apiUrl) => {
-        if (!url || !user) return; // Only fetch if user is logged in
-        try {
-            const response = await fetch(`${url}/history`);
-            if (response.ok) {
-                const data = await response.json();
-                setHistory(data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch history:", error);
-        }
-    };
-
-    const checkHealth = async (url: string) => {
-        if (!url) return;
-        try {
-            const response = await fetch(`${url}/health`);
-            if (response.status === 503) {
-                setDbError(true);
-            } else {
-                setDbError(false);
-            }
-        } catch (error) {
-            console.error("Health check failed:", error);
-            setDbError(true);
-        }
-    };
-
+    // Load config
     useEffect(() => {
-        // Only fetch config and data if user is authenticated
         if (user) {
             fetch("/api/config")
                 .then((res) => res.json())
                 .then((data) => {
                     setApiUrl(data.apiUrl);
-                    fetchHistory(data.apiUrl);
-                    checkHealth(data.apiUrl);
                 })
                 .catch((err) => console.error("Failed to load config:", err));
         } else if (!authLoading && !user) {
-            // Redirect to home if not logged in
             router.push("/");
         }
     }, [user, authLoading, router]);
 
-    const deleteHistory = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this report?")) return;
-        try {
-            const response = await fetch(`${apiUrl}/history/${id}`, { method: "DELETE" });
-            if (response.ok) {
-                setHistory(history.filter(item => item.id !== id));
-            }
-        } catch (error) {
-            console.error("Failed to delete history item:", error);
-        }
+
+    const GetSortIcon = ({ columnKey }: { columnKey: keyof HistoryRecord }) => {
+        if (sortConfig.key !== columnKey) return <ArrowUpDown size={14} className="ml-1 text-gray-400" />;
+        if (sortConfig.direction === 'asc') return <ArrowUp size={14} className="ml-1 text-blue-600" />;
+        return <ArrowDown size={14} className="ml-1 text-blue-600" />;
     };
 
     if (authLoading) {
@@ -130,7 +68,7 @@ export default function HistoryPage() {
     }
 
     if (!user) {
-        return null; // Will redirect in useEffect
+        return null;
     }
 
     return (
@@ -162,19 +100,7 @@ export default function HistoryPage() {
                 </div>
             </header>
 
-            {/* Database Connection Error Banner */}
-            {dbError && (
-                <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r shadow-sm flex items-start gap-3">
-                    <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={24} />
-                    <div>
-                        <h3 className="text-red-800 font-bold">Database Connection Issue</h3>
-                        <p className="text-red-700 text-sm mt-1">
-                            Warning: The application is currently unable to connect to the database.
-                            History features may be unavailable.
-                        </p>
-                    </div>
-                </div>
-            )}
+            <DbConnectionBanner isVisible={dbError} />
 
             {/* History Section */}
             <div className="bg-white p-8 rounded-xl shadow-md min-h-[500px]">
@@ -274,27 +200,7 @@ export default function HistoryPage() {
                                                 <Eye size={18} />
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    const reportContent = `DNA Analysis Report
--------------------
-Timestamp: ${new Date(record.timestamp).toLocaleString()}
-User: ${record.username || "Anonymous"}
-Total Mass: ${record.total_mass}
-Is Protein: ${record.is_protein ? "YES" : "NO"}
--------------------
-Sequence:
-${record.sequence}
-`;
-                                                    const blob = new Blob([reportContent], { type: 'text/plain' });
-                                                    const url = URL.createObjectURL(blob);
-                                                    const a = document.createElement('a');
-                                                    a.href = url;
-                                                    a.download = `analysis_report_${record.id}.txt`;
-                                                    document.body.appendChild(a);
-                                                    a.click();
-                                                    document.body.removeChild(a);
-                                                    URL.revokeObjectURL(url);
-                                                }}
+                                                onClick={() => downloadReport(record)}
                                                 className="text-blue-600 hover:text-blue-800 transition-colors"
                                                 title="Download Report"
                                             >
