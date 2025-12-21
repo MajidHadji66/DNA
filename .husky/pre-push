@@ -1,2 +1,6 @@
-cd frontend
+#!/bin/sh
+echo "Running pre-push hook..."
+echo "Current directory: $(pwd)"
+cd frontend || exit 1
+echo "Executing tests in frontend directory..."
 npm run test
