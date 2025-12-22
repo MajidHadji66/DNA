@@ -51,6 +51,8 @@ export default function Home() {
     if (user) {
       fetchConfig()
         .then((data) => {
+          // If the server returns null (explicitly missing config), we set it to null 
+          // If it returns a URL (including default localhost in dev), we use it
           setApiUrl(data.apiUrl);
         })
         .catch((err) => console.error("Failed to load config:", err));
@@ -62,6 +64,28 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Configuration Error State
+  if (user && apiUrl === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center flex-col p-4 text-center">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-8 max-w-lg">
+          <h2 className="text-2xl font-bold text-red-700 mb-4">Configuration Error</h2>
+          <p className="text-red-600 mb-6">
+            The application cannot connect to the backend server. The <code>API_URL</code> environment variable is missing.
+          </p>
+          <div className="text-sm text-gray-600 bg-white p-4 rounded border border-gray-200 text-left">
+            <p className="font-semibold mb-2">How to fix:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Check your deployment settings (Cloud Run, Vercel, etc.)</li>
+              <li>Ensure <code>API_URL</code> is set to your backend URL</li>
+              <li>If running locally, check your <code>.env</code> file</li>
+            </ul>
+          </div>
+        </div>
       </div>
     );
   }
